@@ -56,6 +56,6 @@ def get_network(file_path):
     return layer_sizes, network
 
 if __name__ == '__main__':
-    print("Enter testnet file path, For example: testnet0.txt")
+    print("Enter testnet file path, For example: testnet1.txt")
     testnet_file = input()
     runnet1('wnet1.txt', testnet_file)
