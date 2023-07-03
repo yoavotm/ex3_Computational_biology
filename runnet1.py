@@ -30,7 +30,6 @@ def runnet1(weight_file, test_file):
     output = best_solution.classify(input_data)
 
     #convert output to '0' and '1' array
-    print(output)
     output = ['1' if x == 1 else '0' for x in output]
 
     with open('sol0.txt', 'w') as f:
