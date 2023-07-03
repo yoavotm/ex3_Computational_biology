@@ -32,7 +32,7 @@ def runnet1(weight_file, test_file):
     #convert output to '0' and '1' array
     output = ['1' if x == 1 else '0' for x in output]
 
-    with open('sol0.txt', 'w') as f:
+    with open('sol1.txt', 'w') as f:
         for i in range(len(output)):
             f.write(output[i] + '\n')
 
