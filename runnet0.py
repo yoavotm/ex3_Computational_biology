@@ -1,5 +1,5 @@
 import numpy as np
-from buildnet0 import Net
+from buildnet0 import NN
 from Config_nn0 import *
 from helpers import *
 
@@ -16,7 +16,7 @@ def compute_accuracy(predictions, labels):
 def runnet0(weight_file, test_file):
     layer_sizes, network = get_network(weight_file)
 
-    best_solution = Net(layer_sizes, network, False)
+    best_solution = NN(layer_sizes, network, False)
 
     with open(test_file, 'r') as file:
         data = file.read().splitlines()
@@ -57,7 +57,6 @@ def get_network(file_path):
     return layer_sizes, network
 
 if __name__ == '__main__':
-    print("Enter the testnet file path")
-    print("For example: 'testnet0.txt', without the quotes:")
+    print("Enter testnet file path, For example: testnet0.txt")
     testnet_file = input()
     runnet0('wnet0.txt', testnet_file)

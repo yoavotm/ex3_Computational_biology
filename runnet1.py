@@ -1,42 +1,9 @@
 import numpy as np
-
-# Convert all 0 labels to -1
-def normalize(input):
-    input[input == 0] = -1
-    return input
+from buildnet0 import NN
+from Config_nn1 import *
+from helpers import *
 
 # Neural network class
-class Net:
-    def __init__(self, all_layers_sizes, weights):
-        self.layer_sizes = all_layers_sizes
-        self.weights = weights
-
-    # Compute the dot product of weights and inputs
-    def dot_product(self, inputs, weights):
-        return np.dot(inputs, weights)
-
-    def sigmoid(self, x):
-        return 1.0 / (1.0 + np.exp(-x))
-
-    def forward(self, data):
-        if data.ndim == 1:
-            data = np.reshape(data, (1, -1))
-        for i in range(len(self.weights)):
-            updated_inputs = []
-            for j in range(self.weights[i].shape[1]):
-                # Extract weights for the jth neuron in the current layer
-                weights = np.reshape(self.weights[i][:, j], (-1,))
-                # Compute dot product
-                product = self.dot_product(data, weights)
-                updated_inputs.append(self.sigmoid(product))
-            data = np.array(updated_inputs).T
-        return data
-
-    def classify(self, inputs):
-        outputs = self.forward(inputs)
-        # Converts the output of the final layer to binary predictions
-        binary_predictions = (outputs > 0.5).astype(int)
-        return binary_predictions
 
 def compute_accuracy(predictions, labels):
     # Compute the accuracy of the predictions by comparing to the labels
@@ -49,7 +16,7 @@ def compute_accuracy(predictions, labels):
 def runnet1(weight_file, test_file):
     layer_sizes, network = get_network(weight_file)
 
-    best_solution = Net(layer_sizes, network)
+    best_solution = NN(layer_sizes, network, False)
 
     with open(test_file, 'r') as file:
         data = file.read().splitlines()
@@ -63,9 +30,10 @@ def runnet1(weight_file, test_file):
     output = best_solution.classify(input_data)
 
     #convert output to '0' and '1' array
-    output = [str(out[0]) for out in output]
+    print(output)
+    output = ['1' if x == 1 else '0' for x in output]
 
-    with open('sol1.txt', 'w') as f:
+    with open('sol0.txt', 'w') as f:
         for i in range(len(output)):
             f.write(output[i] + '\n')
 
@@ -81,7 +49,7 @@ def get_network(file_path):
             network = lines[lines.index(line) + 1:]
             # concat it as a string
             network = ''.join(network)
-            break;
+            break
 
     # convert every "array" instance to numpy.ndarray
     network = network.replace("array", "np.array")
@@ -89,7 +57,6 @@ def get_network(file_path):
     return layer_sizes, network
 
 if __name__ == '__main__':
-    print("Enter the testnet file path")
-    print("For example: 'testnet1.txt', without the quotes:")
+    print("Enter testnet file path, For example: testnet0.txt")
     testnet_file = input()
     runnet1('wnet1.txt', testnet_file)

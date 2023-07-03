@@ -8,7 +8,7 @@ from Config_nn0 import *
 # Neural net class
 
 
-class Net:
+class NN:
     def __init__(self, layers_sizes, weights=[], init=True):
         self.layers_dims = layers_sizes
         # Giving option to initialize net with predefined weights instead off random weights
@@ -81,7 +81,7 @@ def population_initialization():
         layer_sizes = [8]
         layer_sizes.insert(0, 16)
         layer_sizes.append(1)
-        nn = Net(layer_sizes)
+        nn = NN(layer_sizes)
         POPULATION_ARRAY.append((nn, 0))
 
 # Creating one dimensional list from multidimensional list
@@ -155,7 +155,7 @@ class Gen:
                 child[:the_chosen_one] = copy.deepcopy(
                     p1_weights[:the_chosen_one])
             child = re_shape(child, sizes)
-            final_offspring = Net(sizes, child, False)
+            final_offspring = NN(sizes, child, False)
             POPULATION_ARRAY.append(
                 (final_offspring, final_offspring.fitness_function(train_inputs, train_labels)))
 

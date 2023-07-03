@@ -26,12 +26,10 @@ def load_data_from_path(path):
     return np.array(samples), np.array(labels)
 
 def load_data():
-    #train_path = input("Enter the path to the training data: ")
-    train_path = 'nn1_train.txt'
+    train_path = input("Enter the path to the training data: ")
     train_input, train_label = load_data_from_path(train_path)
 
-    # test_path = input("Enter the path to the testing data: ")
-    test_path = 'nn1_test.txt'
+    test_path = input("Enter the path to the testing data: ")
     test_input, test_label = load_data_from_path(test_path)
 
     return normalize(train_input), train_label, normalize(test_input), test_label
