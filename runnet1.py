@@ -1,5 +1,5 @@
 import numpy as np
-from buildnet0 import NN
+from buildnet1 import NN
 from Config_nn1 import *
 from helpers import *
 
