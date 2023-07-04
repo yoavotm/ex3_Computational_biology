@@ -4,20 +4,14 @@ import numpy as np
 from helpers import *
 from Config_nn1 import *
 
-
-# Neural net class
-
-
 class NN:
     def __init__(self, layers_sizes, weights=[], init=True):
         self.layers_dims = layers_sizes
-        # Giving option to initialize net with predefined weights instead off random weights
         if init:
             self.weights = self.init_net()
         else:
             self.weights = weights
 
-    # Initialize the net's weights with Xavier initialization
     def init_net(self):
         nn = []
         for idx in range(len(self.layers_dims) - 1):
@@ -35,27 +29,21 @@ class NN:
         for i in range(len(self.weights)):
             updated_inputs = []
             for j in range(self.weights[i].shape[1]):
-                # Extract weights for the jth neuron in the current layer
                 weights = np.reshape(self.weights[i][:, j], (-1,))
-                # Compute dot product
                 product = np.dot(data, weights)
                 updated_inputs.append(sigmoid(product))
             data = np.array(updated_inputs).T
         return data
 
-    # Calculating fitness score for a neural net
     def fitness_function(self, data, labels, test=False):
         count = 0
-        # Perform forward propagation
         outputs = self.forward_pass(data)
         binar_preds = (outputs > 0.5).astype(int)
         preds = binar_preds.flatten()
-        # Checking if the predictions were correct
         for label, y in zip(labels, preds):
             if label == y:
                 count += 1
         score = count / len(preds)
-        # Regularization only if we in train stage
         if test == False:
             reg = 0
             for layer in self.weights:
@@ -70,11 +58,6 @@ class NN:
         preds = binar_preds.flatten()
         return preds
 
-# Writing the best neural net and it's accuracy to output file
-
-
-
-
 def population_initialization():
     global POPULATION_SIZE, POPULATION_ARRAY
     for _ in range(POPULATION_SIZE):
@@ -84,19 +67,13 @@ def population_initialization():
         nn = NN(layer_sizes)
         POPULATION_ARRAY.append((nn, 0))
 
-# Creating one dimensional list from multidimensional list
-
-
 def flat(list):
     new_list = []
-    # Going over every item in the list adding them one after another
     for layer in list:
         for layer2 in layer:
             for i in layer2:
                 new_list.append(i)
     return new_list
-
-# Creating multidimensional list from one dimensional list
 
 
 def re_shape(list, dimensions):
@@ -117,26 +94,21 @@ class Gen:
         global DELTA, POPULATION_ARRAY, train_labels, train_inputs
         for net, score in mutations:
             for weight in net.weights:
-                # Creating random array of 0 or 1
                 mutation = np.random.choice(
                     [0, 1], size=weight.shape, p=[0, 1])
                 for i, row in enumerate(weight):
                     for j, k in enumerate(row):
-                        # If the item in the random array that matches a weight has 1 as value tahn mutate by
-                        # adding random value to the weight
                         if mutation[i, j]:
                             weight[i, j] += np.random.uniform(-DELTA, DELTA)
             weights_fit = net.fitness_function(train_inputs, train_labels)
             POPULATION_ARRAY.append((net, weights_fit))
 
-    # Adding crossovers between random nets to the population
     def crossover(self, crossovers_number):
         global POPULATION_ARRAY, train_inputs, train_labels, test_inputs, test_labels, CROSSOVERS_COUNT
         for i in range(crossovers_number):
             par1, par2 = random.sample(POPULATION_ARRAY, 2)
             p1_weights = flat(par1[0].weights)
             p2_weights = flat(par2[0].weights)
-            # Taking the more fit parent as first parent
             if par1[1] > par2[1]:
                 first_parent = 1
                 child = copy.deepcopy(p1_weights)
@@ -145,8 +117,6 @@ class Gen:
                 first_parent = 2
                 child = copy.deepcopy(p2_weights)
                 sizes = par2[0].layers_dims
-            # Choosing random index. The child will have the weights of first parent until this index, and weights
-            # of second parent after this index
             the_chosen_one = np.random.randint(len(p1_weights) - 1)
             if first_parent == 1:
                 child[:the_chosen_one] = copy.deepcopy(
@@ -169,18 +139,14 @@ class Gen:
                     delta = np.random.uniform(-DELTA, DELTA, size=weight.shape)
                     weight += rnd * delta
                 weights_fit = net.fitness_function(train_inputs, train_labels)
-                # check if the best score of this generation is the best so far. if so, remember the solution
                 if weights_fit > best_fintness_score:
                     best_fintness_score = weights_fit
             POPULATION_ARRAY.append((net, best_fintness_score))
-
-    # This genetic algorithm finds the neural nets with best weights instead of using back-propagation
 
     def run_genetic_algorithm(self):
         counter_gens_unchanged = 0
         best = float('inf')
         global NUMBER_OF_GENERATIONS, POPULATION_ARRAY, POPULATION_SIZE, MAX_WITHOUT_CHANGE, MUTATIONS_COUNT
-        # The loop executes the NUMBER_OF_GENERATIONS of the the genetic algorithm
         for i in range(NUMBER_OF_GENERATIONS):
             POPULATION_ARRAY = sorted(
                 POPULATION_ARRAY, key=lambda x: x[1], reverse=True)
@@ -189,7 +155,6 @@ class Gen:
             self.crossover(CROSSOVERS_COUNT)
             list_mut = random.sample(POPULATION_ARRAY, k=MUTATIONS_COUNT)
             self.mutation(list_mut)
-            # Sorting by fitness and taking best population, decreasing order
             POPULATION_ARRAY = sorted(
                 POPULATION_ARRAY, key=lambda x: x[1], reverse=True)
             POPULATION_ARRAY = POPULATION_ARRAY[:POPULATION_SIZE]
@@ -199,7 +164,6 @@ class Gen:
             else:
                 counter_gens_unchanged = 0
             best = POPULATION_ARRAY[0][1]
-            # If no change for to long we return te best score and without completing the maximal NUMBER_OF_GENERATIONS number
             if counter_gens_unchanged > MAX_WITHOUT_CHANGE:
                 return POPULATION_ARRAY[0]
         # Return best net
@@ -208,7 +172,6 @@ class Gen:
 
 def run_genetic_algorithm():
     best_score = 0
-    # Calculating fitness for the random nets for the first time
     for i in range(len(POPULATION_ARRAY)):
         current_net = POPULATION_ARRAY[i][0]
         current_fitness_score = current_net.fitness_function(
